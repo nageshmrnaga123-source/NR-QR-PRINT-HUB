@@ -1,0 +1,715 @@
+﻿<!DOCTYPE html>
+<html lang="kn">
+<head>
+     <!-- Cropper.js CSS & JS CDN -->
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css"/>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ಫೈಲ್ ಪ್ರಿಂಟ್ ಮಾಡಿ - NR QR PRINT SHOP</title>
+    
+    <!-- Bootstrap 5, Google Fonts & Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- QRCode.js Library CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/davidshimjs-qrcodejs@0.0.2/qrcode.min.js"></script>
+
+    <style>
+        :root {
+            --primary: #1b5e20;
+            --primary-gradient: linear-gradient(135deg, #1b5e20, #2e7d32);
+            --accent: #fbc02d;
+        }
+        body {
+            font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(180deg, #f1f8e9 0%, #ffffff 280px);
+            min-height: 100vh;
+            color: #1e293b;
+            padding-bottom: 30px;
+        }
+        .shop-header {
+            background: var(--primary-gradient);
+            color: #ffffff;
+            border-bottom: 4px solid var(--accent);
+            padding: 24px 16px 20px 16px;
+            border-bottom-left-radius: 24px;
+            border-bottom-right-radius: 24px;
+            box-shadow: 0 10px 25px rgba(27, 94, 32, 0.2);
+            text-align: center;
+        }
+        .rate-badge {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: 12px;
+            padding: 8px 14px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.85rem;
+            font-weight: 700;
+        }
+        .upload-dropzone {
+            background: #ffffff;
+            border: 2px dashed #81c784;
+            border-radius: 20px;
+            padding: 28px 16px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.04);
+        }
+        .upload-dropzone:hover, .upload-dropzone.dragover {
+            border-color: #2e7d32;
+            background: #f9fbf7;
+            transform: translateY(-2px);
+        }
+        .upload-icon-circle {
+            width: 72px;
+            height: 72px;
+            margin: 0 auto 12px auto;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #2e7d32;
+            font-size: 32px;
+        }
+        .print-type-btn {
+            border: 2px solid #e2e8f0;
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 14px 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+            user-select: none;
+        }
+        .print-type-btn.active {
+            border-color: #2e7d32;
+            background: #f1f8e9;
+            box-shadow: 0 4px 12px rgba(46, 125, 50, 0.15);
+        }
+        .counter-box {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+        .counter-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: #f1f5f9;
+            border: 1px solid #cbd5e1;
+            font-size: 20px;
+            font-weight: 900;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+        .counter-btn:active {
+            background: #e2e8f0;
+            transform: scale(0.95);
+        }
+        .counter-value {
+            font-size: 24px;
+            font-weight: 900;
+            min-width: 44px;
+            text-align: center;
+        }
+        .submit-btn {
+            background: linear-gradient(135deg, #1b5e20, #2e7d32);
+            color: white;
+            border: none;
+            padding: 16px;
+            border-radius: 50px;
+            font-size: 1.15rem;
+            font-weight: 800;
+            box-shadow: 0 10px 20px rgba(27, 94, 32, 0.3);
+            transition: all 0.2s;
+        }
+        .submit-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 14px 25px rgba(27, 94, 32, 0.4);
+        }
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        .token-badge {
+            background: #0f172a;
+            color: #facc15;
+            font-family: monospace;
+            font-size: 1.6rem;
+            font-weight: 900;
+            padding: 10px 22px;
+            border-radius: 12px;
+            display: inline-block;
+            letter-spacing: 2px;
+            border: 2px solid #eab308;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+    @keyframes rotateBorderColors {
+    0% { 
+        border-color: #2e7d32; 
+        box-shadow: 0 0 10px rgba(46, 125, 50, 0.2); 
+    }
+    25% { 
+        border-color: #2196f3; 
+        box-shadow: 0 0 10px rgba(33, 150, 243, 0.2); 
+    }
+    50% { 
+        border-color: #9c27b0; 
+        box-shadow: 0 0 10px rgba(156, 39, 176, 0.2); 
+    }
+    75% { 
+        border-color: #ff9800; 
+        box-shadow: 0 0 10px rgba(255, 152, 0, 0.2); 
+    }
+    100% { 
+        border-color: #2e7d32; 
+        box-shadow: 0 0 10px rgba(46, 125, 50, 0.2); 
+    }
+}
+
+.upload-dropzone {
+    border: 3px dashed #2e7d32;
+    animation: rotateBorderColors 5s infinite linear;
+}
+/* Multi-color Rotating Glow Ring Animation */
+@keyframes rotateGlow {
+    0% { filter: hue-rotate(0deg); }
+    100% { filter: hue-rotate(360deg); }
+}
+
+.csc-round-badge {
+    position: relative;
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #ff007f, #00ffcc, #ffcc00, #7928ca);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: rotateGlow 3s linear infinite;
+    box-shadow: 0 0 20px rgba(0, 255, 204, 0.5), 0 0 40px rgba(255, 0, 127, 0.3);
+    padding: 3px;
+    margin: 0 auto 15px auto;
+}
+
+.csc-inner-circle {
+    width: 100%;
+    height: 100%;
+    background: #ffffff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    color: #1b5e20;
+}
+
+/* Glassmorphism Card with Round Glowing Border */
+.csc-beauty-card {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border: 2px solid transparent;
+    background-clip: padding-box;
+    border-radius: 24px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+    position: relative;
+    overflow: hidden;
+}
+
+.csc-beauty-card::before {
+    content: '';
+    position: absolute;
+    top: -2px; left: -2px; right: -2px; bottom: -2px;
+    background: linear-gradient(45deg, #1b5e20, #00c853, #ffb300, #d50000, #2962ff);
+    z-index: -1;
+    border-radius: 26px;
+    animation: rotateGlow 6s linear infinite;
+}
+</style>
+<style>
+@keyframes spinLight {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+@keyframes rainbowText {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+.office-glow-box {
+    position: relative;
+    display: inline-block;
+    padding: 4px;
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 0 25px rgba(255, 215, 0, 0.5), 0 0 40px rgba(0, 255, 136, 0.3);
+    margin: 8px auto;
+}
+.office-glow-box::before {
+    content: '';
+    position: absolute;
+    top: -50%; left: -50%;
+    width: 200%; height: 200%;
+    background: conic-gradient(#ff0055, #ffcc00, #00ff88, #00ccff, #aa00ff, #ff0055);
+    animation: spinLight 3s linear infinite;
+    z-index: 0;
+}
+.office-glow-inner {
+    position: relative;
+    z-index: 1;
+    background: #0f172a;
+    padding: 10px 26px;
+    border-radius: 14px;
+}
+.office-rainbow-title {
+    font-weight: 900;
+    letter-spacing: 1.5px;
+    background: linear-gradient(90deg, #ffeb3b, #00e676, #00e5ff, #ff4081, #ffeb3b);
+    background-size: 300% 300%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: rainbowText 4s ease infinite;
+    margin: 0;
+    text-transform: uppercase;
+}
+</style>
+<style>
+@keyframes spinBorderLight {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+@keyframes multiColorText {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+.nr-rotating-pill {
+    position: relative !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 4px !important;
+    border-radius: 50px !important;
+    overflow: hidden !important;
+    background: transparent !important;
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.7), 0 0 35px rgba(0, 229, 255, 0.5) !important;
+    margin: 6px auto !important;
+}
+.nr-rotating-pill::before {
+    content: '' !important;
+    position: absolute !important;
+    top: -150% !important; left: -50% !important;
+    width: 200% !important; height: 400% !important;
+    background: conic-gradient(#ff0055, #ffdd00, #00ff88, #00ccff, #aa00ff, #ff0055) !important;
+    animation: spinBorderLight 2.5s linear infinite !important;
+    z-index: 0 !important;
+}
+.nr-rotating-inner {
+    position: relative !important;
+    z-index: 1 !important;
+    background: #0f172a !important;
+    padding: 8px 22px !important;
+    border-radius: 50px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+}
+.nr-glow-name {
+    font-weight: 900 !important;
+    font-size: 1.15rem !important;
+    letter-spacing: 0.8px !important;
+    background: linear-gradient(90deg, #ffeb3b, #00e676, #00e5ff, #ff4081, #ffeb3b) !important;
+    background-size: 300% 300% !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    animation: multiColorText 3.5s ease infinite !important;
+}
+</style>
+</head>
+<body>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <div class="container d-flex justify-content-end pt-2" style="max-width:520px;">
+      <label for="languageSelect" class="visually-hidden">ಭಾಷೆ ಆಯ್ಕೆಮಾಡಿ</label>
+      <select id="languageSelect" class="form-select form-select-sm fw-bold" style="max-width:155px;border:1px solid #2e7d32;border-radius:12px;" aria-label="ಭಾಷೆ ಆಯ್ಕೆಮಾಡಿ">
+        <option value="kn">ಕನ್ನಡ</option>
+        <option value="en">English</option>
+        <option value="hi">हिन्दी</option>
+      </select>
+    </div>
+
+    <!-- 1. Header with Shop Branding -->
+    <div class="shop-header">
+        <div class="nr-rotating-pill"><div class="nr-rotating-inner"><span class="nr-glow-name">
+            <i class="bi bi-patch-check-fill text-primary"></i> ಎನ್‌ ಆರ್‌ ಕಂಪ್ಯೂಟರ್ಸ್‌ ಮೇಲೂರು
+        </span></div></div>
+           
+        <!-- Rate Card Badges -->
+        <div class="d-flex justify-content-center gap-2 flex-wrap mt-2">
+            
+            
+        </div>
+    </div>
+
+    <!-- 2. Main Content Container -->
+    <div class="container" style="max-width: 520px; margin-top: -10px;">
+<!-- CSC & GRAMAONE GLOWING ROUND HEADER -->
+<div class="text-center py-4">
+    <div class="csc-round-badge">
+        <div class="csc-inner-circle shadow-sm">
+            <i class="bi bi-patch-check-fill text-success"></i>
+        </div>
+    </div>
+    <span class="badge bg-success px-4 py-1.5 rounded-pill fw-bold mb-2 shadow-sm fs-6">
+        <i class="bi bi-shield-shaded me-1"></i> ಅಧಿಕೃತ ಸೇವಾ ಕೇಂದ್ರ (Authorized Center)
+    </span>
+    <h1 class="fw-black text-dark mb-1 display-6 tracking-wide">
+        CSC & <span class="text-success">GRAMAONE</span> DIGITAL HUB
+    </h1>
+    <p class="text-muted small fw-semibold mb-0">
+        <i class="bi bi-geo-alt-fill text-danger"></i>&bull; ಎಲ್ಲಾ ಇ-ಆಡಳಿತ ಮತ್ತು ಡಿಜಿಟಲ್ ಸೇವೆಗಳು ಹಾಗೂ ಆಧಾರ ಸೇವೆಗಳು PAN ಕಾರ್ಡ್‌ PVC ಕಾರ್ಡ್‌  ಮಾಡಿಕೊಡಲಾಗುತ್ತದೆ.
+    </p>
+</div>
+        <!-- FORM CONTAINER -->
+        <div id="formSection" class="card border-0 rounded-4 shadow-lg p-3 p-sm-4 bg-white">
+            
+            <form id="uploadPrintForm" enctype="multipart/form-data">
+                <input type="hidden" name="shop_id" value="VLE-269513">
+                <input type="hidden" id="inputPrintType" name="printType" value="bw">
+                <input type="hidden" id="inputCopies" name="copies" value="1">
+                <input type="hidden" id="inputPaperSize" name="paperSize" value="A4">
+                <input type="hidden" id="inputPrintSide" name="printSide" value="single">
+<!-- Your Details Section -->
+   
+                <!-- STEP 1: FILE PICKER -->
+                <div class="mb-4">
+                    <label class="form-label fw-bold text-dark d-flex align-items-center justify-content-between">
+                        <span><span class="badge bg-success rounded-circle me-1">1</span> ನಿಮ್ಮ ಫೈಲ್ ಆಯ್ಕೆಮಾಡಿ (ದಾಖಲೆ / ಫೋಟೋ)</span>
+                        <span class="text-muted extra-small">Max 25MB</span>
+                    </label>
+
+                    <label for="fileInput" class="upload-dropzone d-block w-100 mb-0" id="dropzoneBox" style="cursor: pointer;">
+                        <div class="upload-icon-circle">
+                            <i class="bi bi-cloud-arrow-up-fill"></i>
+                        </div>
+                        <h6 class="fw-bold mb-1" id="filePickText">ಫೈಲ್ ಆಯ್ಕೆ ಮಾಡಲು ಇಲ್ಲಿ ಒತ್ತಿರಿ</h6>
+                        <p class="text-muted small mb-0">PDF ಡಾಕ್ಯುಮೆಂಟ್ ಫೈಲ್‌ಗಳು</p>
+                        
+                        <!-- File Preview Card when selected -->
+                        <div id="fileSelectedPreview" class="d-none mt-3 p-2 bg-light rounded-3 text-start border">
+                            <div class="d-flex align-items-center gap-2">
+                                <i class="bi bi-file-earmark-check-fill text-success fs-3"></i>
+                                <div class="overflow-hidden">
+                                    <div class="fw-bold text-truncate" id="selectedFileName">filename.pdf</div>
+                                    <div class="extra-small text-muted" id="selectedFileSize">0 KB</div>
+                                </div>
+                            </div>
+                        </div>
+                    </label>
+                    <!-- IMPORTANT: name="document" matches upload.single('document') in server.js -->
+                    <!-- ಮೊದಲು ಇದ್ದದ್ದು: <input type="file" id="fileInput" name="document" ...> -->
+<!-- ಈಗ ಹೀಗೆ ಬದಲಾಯಿಸಿ (multiple ಸೇರಿಸಿ): -->
+<!-- ಸರಿಯಾದ ವಿಧಾನ: -->
+<input type="file" id="fileInput" name="document" multiple accept=".pdf,.png,.jpg,.jpeg" class="d-none" required>
+                </div>
+
+                <!-- STEP 2: PRINT TYPE (Color vs B/W) -->
+                <div class="mb-4">
+                    <label class="form-label fw-bold text-dark">
+                        <span class="badge bg-success rounded-circle me-1">2</span> ಪ್ರಿಂಟ್ ಪ್ರಕಾರ ಆಯ್ಕೆಮಾಡಿ
+                    </label>
+                    <div class="row g-2">
+                        <div class="col-6">
+                            <div class="print-type-btn active" id="btnTypeBw" onclick="selectPrintType('bw')">
+                                <i class="bi bi-file-earmark-text fs-3 text-dark d-block mb-1"></i>
+                                <span class="fw-bold d-block">ಕಪ್ಪು ಮತ್ತು ಬಿಳಿ</span>
+                                <span class="text-muted small">ಕಪ್ಪು-ಬಿಳಿ ಪ್ರಿಂಟ್</span>
+                                <div class="fw-black text-success mt-1">₹5/ಪ್ರತಿ</div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="print-type-btn" id="btnTypeColor" onclick="selectPrintType('color')">
+                                <i class="bi bi-palette-fill fs-3 text-danger d-block mb-1"></i>
+                                <span class="fw-bold d-block">ಬಣ್ಣದ ಪ್ರಿಂಟ್</span>
+                                <span class="text-muted small">ಬಣ್ಣದ ಪ್ರಿಂಟ್</span>
+                                <div class="fw-black text-danger mt-1">₹10/ಪ್ರತಿ</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- STEP 3: NUMBER OF COPIES -->
+                <div class="mb-4">
+                    <label class="form-label fw-bold text-dark d-flex justify-content-between align-items-center">
+                        <span><span class="badge bg-success rounded-circle me-1">3</span> ಪ್ರತಿಗಳ ಸಂಖ್ಯೆ</span>
+                    </label>
+                    <div class="counter-box bg-light p-2 rounded-4 border">
+                        <button type="button" class="counter-btn text-danger" onclick="adjustCopies(-1)">−</button>
+                        <span class="counter-value" id="displayCopies">1</span>
+                        <button type="button" class="counter-btn text-success" onclick="adjustCopies(1)">+</button>
+                    </div>
+                </div>
+
+                <!-- STEP 4: TOTAL BILL -->
+                <div class="p-3 bg-light rounded-4 border mb-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="text-muted fw-bold"><i class="bi bi-receipt text-success me-1"></i> ಒಟ್ಟು ಅಂದಾಜು ಮೊತ್ತ:</span>
+                        <span class="fs-4 fw-black text-success" id="displayTotalAmount">₹5</span>
+                    </div>
+                </div>
+
+                <!-- SUBMIT BUTTON -->
+                <button type="submit" id="btnSubmitPrint" class="submit-btn w-100 d-flex align-items-center justify-content-center gap-2">
+                    <i class="bi bi-printer-fill fs-5"></i>
+                    <span>ಪ್ರಿಂಟ್ ಮಾಡಲು ಫೈಲ್ ಕಳುಹಿಸಿ</span>
+                </button>
+            </form>
+
+            <div class="text-center mt-3 text-muted extra-small">
+                <i class="bi bi-shield-lock-fill text-success"></i>ಫೈಲ್ ಸುರಕ್ಷಿತವಾಗಿ ರವಾನೆಯಾಗಿ ನೇರವಾಗಿ ಅಂಗಡಿ ನಿರ್ವಾಹಕರ ಕಂಪ್ಯೂಟರ್‌ಗೆ ತಲುಪುತ್ತದೆ
+            </div>
+        </div>
+
+        <!-- UPLOADING PROGRESS STATE -->
+        <div id="uploadingSection" class="card border-0 rounded-4 shadow-lg p-5 bg-white text-center d-none">
+            <div class="spinner-border text-success mx-auto mb-3" style="width: 3.5rem; height: 3.5rem;" role="status"></div>
+            <h4 class="fw-black mb-1">ಫೈಲ್ ಕಳುಹಿಸಲಾಗುತ್ತಿದೆ...</h4>
+            <p class="text-muted small">ದಯವಿಟ್ಟು ಕಾಯಿರಿ. ನಿಮ್ಮ ಫೈಲ್ ಅಂಗಡಿಯ ಪ್ರಿಂಟರ್ ವ್ಯವಸ್ಥೆಗೆ ಕಳುಹಿಸಲಾಗುತ್ತಿದೆ.</p>
+        </div>
+
+        <!-- SUCCESS CONFIRMATION STATE -->
+        <div id="successSection" class="card border-0 rounded-4 shadow-lg p-4 p-sm-5 bg-white text-center d-none">
+            <div class="w-16 h-16 bg-success bg-opacity-10 text-success rounded-circle mx-auto d-flex align-items-center justify-content-center mb-3" style="width: 76px; height: 76px; font-size: 38px;">
+                <i class="bi bi-check-circle-fill"></i>
+            </div>
+            
+            <h4 class="fw-black text-dark mb-1">ಫೈಲ್ ಯಶಸ್ವಿಯಾಗಿ ತಲುಪಿದೆ!</h4>
+            <p class="text-muted small mb-3">ನಿಮ್ಮ ಪ್ರಿಂಟ್ ಫೈಲ್ ಅಂಗಡಿಯ ವ್ಯವಸ್ಥೆಯಲ್ಲಿ ದಾಖಲಾಗಿದೆ.</p>
+<div class="my-3 p-3 rounded-4" style="background:#f8fafc; border: 2px dashed #2e7d32;"><div class="small fw-bold text-secondary mb-1">TOKEN NUMBER</div><div id="resToken" class="token-badge">#---</div><div class="small text-dark mt-2 fw-semibold" id="resFilename"></div><div class="small text-muted" id="resCopies"></div></div>
+
+            <div class="bg-light p-3 rounded-4 border mb-3">
+                <div class="text-muted extra-small">ದಯವಿಟ್ಟು ಕೌಂಟರ್ ಬಳಿ ಪಾವತಿ ಅಥವಾ ಯುಟಿಆರ್ ನಂಬರ್ ಖಚಿತಪಡಿಸಿ.</div>
+            </div>
+
+            <button type="button" class="btn btn-dark w-100 py-2.5 rounded-pill fw-bold" onclick="resetFormForNewJob()">
+                <i class="bi bi-plus-circle me-1"></i> ಮತ್ತೊಂದು ಫೈಲ್ ಕಳುಹಿಸಿ
+            </button>
+        </div>
+    </div>
+
+    <!-- JavaScript Handler -->
+    <script>
+        const bwRate = 5;
+        const colorRate = 10;
+        let currentType = 'bw';
+        let currentCopies = 1;
+
+        const fileInput = document.getElementById('fileInput');
+        const filePickText = document.getElementById('filePickText');
+        const fileSelectedPreview = document.getElementById('fileSelectedPreview');
+        const selectedFileName = document.getElementById('selectedFileName');
+        const selectedFileSize = document.getElementById('selectedFileSize');
+
+        fileInput.addEventListener('change', function(e) {
+            if (this.files && this.files[0]) {
+                const f = this.files[0];
+                selectedFileName.textContent = f.name;
+                selectedFileSize.textContent = (f.size / (1024 * 1024)).toFixed(2) + ' MB';
+                filePickText.textContent = 'ಫೈಲ್ ಆಯ್ಕೆ ಮಾಡಲಾಗಿದೆ (ಬದಲಾಯಿಸಲು ಒತ್ತಿರಿ)';
+                fileSelectedPreview.classList.remove('d-none');
+            }
+        });
+
+        function selectPrintType(type) {
+            currentType = type;
+            document.getElementById('inputPrintType').value = type;
+            if (type === 'bw') {
+                document.getElementById('btnTypeBw').classList.add('active');
+                document.getElementById('btnTypeColor').classList.remove('active');
+            } else {
+                document.getElementById('btnTypeColor').classList.add('active');
+                document.getElementById('btnTypeBw').classList.remove('active');
+            }
+            updateTotal();
+        }
+
+        function adjustCopies(delta) {
+            currentCopies = Math.max(1, Math.min(100, currentCopies + delta));
+            document.getElementById('displayCopies').textContent = currentCopies;
+            document.getElementById('inputCopies').value = currentCopies;
+            updateTotal();
+        }
+
+        function updateTotal() {
+            const rate = (currentType === 'color') ? colorRate : bwRate;
+            const total = (rate * currentCopies).toFixed(0);
+            document.getElementById('displayTotalAmount').textContent = '₹' + total;
+        }
+
+        // Form Submit Handler
+        const uploadPrintForm = document.getElementById('uploadPrintForm');
+        if (uploadPrintForm) {
+            uploadPrintForm.addEventListener('submit', function(e) {
+                e.preventDefault(); // Prevents page reload/reset and URL appending
+
+                if (!fileInput.files || !fileInput.files[0]) {
+                    alert('ದಯವಿಟ್ಟು ಪ್ರಿಂಟ್ ಮಾಡಲು ಫೈಲ್ ಆಯ್ಕೆಮಾಡಿ.');
+                    return;
+                }
+
+                const formData = new FormData(this);
+
+                document.getElementById('formSection').classList.add('d-none');
+                document.getElementById('uploadingSection').classList.remove('d-none');
+
+                fetch('/upload', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(res => res.json())
+                .then(data => {
+                    document.getElementById('uploadingSection').classList.add('d-none');
+                    if (data.success) {
+                        const job = data.job;
+                        
+                        document.getElementById('resToken').textContent = job.id;
+                        document.getElementById('resFilename').textContent = job.original_name;
+                        document.getElementById('resCopies').textContent = `${job.print_side || '1'} Copy (${job.print_type})`;
+
+                        document.getElementById('successSection').classList.remove('d-none');
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                    } else {
+                        document.getElementById('formSection').classList.remove('d-none');
+                        alert('ದೋಷ: ' + (data.error || 'ಫೈಲ್ ಅಪ್‌ಲೋಡ್ ಆಗಲಿಲ್ಲ.'));
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    document.getElementById('uploadingSection').classList.add('d-none');
+                    document.getElementById('formSection').classList.remove('d-none');
+                    alert('ನೆಟ್‌ವರ್ಕ್ ಅಥವಾ ಸರ್ವರ್ ಸಂಪರ್ಕದಲ್ಲಿ ಸಮಸ್ಯೆ ಉಂಟಾಗಿದೆ. ದಯವಿಟ್ಟು ಸರ್ವರ್ ಚಾಲನೆಯಲ್ಲಿದೆಯೇ ಪರಿಶೀಲಿಸಿ.');
+                });
+            });
+        }
+// --- CROPPER.JS LOGIC ---
+    let cropper = null;
+    const imageToCrop = document.getElementById('imageToCrop');
+    const cropModalElement = document.getElementById('cropModal');
+    const cropModal = new bootstrap.Modal(cropModalElement);
+    let originalFileObject = null;
+
+    fileInput.addEventListener('change', function(e) {
+        if (this.files && this.files[0]) {
+            const f = this.files[0];
+            originalFileObject = f;
+
+            if (f.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = function(evt) {
+                    imageToCrop.src = evt.target.result;
+                    cropModal.show();
+                };
+                reader.readAsDataURL(f);
+            } else {
+                selectedFileName.textContent = f.name;
+                selectedFileSize.textContent = (f.size / (1024 * 1024)).toFixed(2) + ' MB';
+                filePickText.textContent = 'ಫೈಲ್ ಆಯ್ಕೆ ಮಾಡಲಾಗಿದೆ (ಬದಲಾಯಿಸಲು ಒತ್ತಿರಿ)';
+                fileSelectedPreview.classList.remove('d-none');
+            }
+        }
+    });
+
+    cropModalElement.addEventListener('shown.bs.modal', function () {
+        if (cropper) cropper.destroy();
+        cropper = new Cropper(imageToCrop, {
+            aspectRatio: NaN,
+            viewMode: 1,
+            autoCropArea: 0.9
+        });
+    });
+
+    document.getElementById('btnCropAndSave').addEventListener('click', function() {
+        if (!cropper) return;
+
+        cropper.getCroppedCanvas({ width: 1200, height: 1200 }).toBlob((blob) => {
+            const croppedFile = new File([blob], originalFileObject.name, { type: originalFileObject.type });
+            
+            const dataTransfer = new DataTransfer();
+            dataTransfer.items.add(croppedFile);
+            fileInput.files = dataTransfer.files;
+
+            selectedFileName.textContent = croppedFile.name;
+            selectedFileSize.textContent = (croppedFile.size / (1024 * 1024)).toFixed(2) + ' MB (Cropped)';
+            filePickText.textContent = 'ಕ್ರಾಪ್ ಮಾಡಿದ ಫೈಲ್ ರೆಡಿಯಾಗಿದೆ!';
+            fileSelectedPreview.classList.remove('d-none');
+
+            cropModal.hide();
+        }, originalFileObject.type);
+    });
+        function resetFormForNewJob() {
+            uploadPrintForm.reset();
+            fileInput.value = '';
+            filePickText.textContent = 'ಫೈಲ್ ಆಯ್ಕೆ ಮಾಡಲು ಇಲ್ಲಿ ಒತ್ತಿರಿ';
+            fileSelectedPreview.classList.add('d-none');
+            selectPrintType('bw');
+            currentCopies = 1;
+            document.getElementById('displayCopies').textContent = '1';
+            updateTotal();
+            document.getElementById('successSection').classList.add('d-none');
+            document.getElementById('formSection').classList.remove('d-none');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+    </script>
+<!-- Image Crop Modal -->
+<div class="modal fade" id="cropModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold">ಫೋಟೋ ಕ್ರಾಪ್ ಮಾಡಿ (Crop Image)</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <div style="max-height: 350px; overflow: hidden;">
+                    <img id="imageToCrop" style="max-width: 100%; display: block;" alt="Crop preview">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary rounded-pill" data-bs-dismiss="modal">ರದ್ದುಮಾಡಿ</button>
+                <button type="button" id="cropAndUseBtn" class="btn btn-success rounded-pill fw-bold">ಕ್ರಾಪ್ ಮಾಡಿ ಬಳಸಿ</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="shopClosedOverlay" style="display:none; position:fixed; inset:0; background:rgba(15,23,42,0.95); z-index:99999; color:#fff; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:24px;">
+    <div style="font-size:64px; margin-bottom:16px;">🔒</div>
+    <h2 style="font-weight:900; color:#facc15; margin-bottom:10px;">ಅಂಗಡಿ ಮುಚ್ಚಿದೆ (SHOP CLOSED)</h2>
+    <p style="font-size:1.1rem; max-width:400px; color:#e2e8f0;">ಕ್ಷಮಿಸಿ, ಪ್ರಸ್ತುತ ಅಂಗಡಿ ಮುಚ್ಚಲಾಗಿದೆ. ದಯವಿಟ್ಟು ಅಂಗಡಿ ತೆರೆದ ನಂತರ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.</p>
+    <button onclick="location.reload()" class="btn btn-warning fw-bold rounded-pill px-4 py-2 mt-3">ಮತ್ತೆ ಪರಿಶೀಲಿಸಿ (Refresh)</button>
+</div>
+<script>
+fetch('/api/shop-status').then(r=>r.json()).then(d=>{
+    if(!d.open) document.getElementById('shopClosedOverlay').style.display = 'flex';
+});
+</script>
+</body>
+</html>
+
+
+
+
+
+
+

@@ -1,0 +1,616 @@
+﻿<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Scan &amp; Print Hub - CSC VLE ಡ್ಯಾಶ್‌ಬೋರ್ಡ್</title>
+    
+    <!-- Bootstrap 5, Icons, Fonts -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet">
+    
+    <!-- Razorpay Checkout Gateway -->
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+    <!-- QRCode.js Library -->
+    <script src="assets/qrcode.min.js"></script>
+    <script>
+        if (typeof QRCode === 'undefined') {
+            document.write('<script src="https://cdn.jsdelivr.net/npm/davidshimjs-qrcodejs@0.0.2/qrcode.min.js"><\/script>');
+        }
+    </script>
+
+    <style>
+        :root {
+            --primary-green: #1b5e20;
+            --primary-gradient: linear-gradient(135deg, #1b5e20 0%, #2e7d32 100%);
+            --accent-yellow: #fbc02d;
+        }
+        body {
+            font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+        }
+        .vle-banner {
+            background: var(--primary-gradient);
+            color: #ffffff;
+            border-bottom: 4px solid var(--accent-yellow);
+            padding: 22px 24px;
+            border-radius: 18px;
+            box-shadow: 0 10px 25px rgba(27, 94, 32, 0.2);
+            margin-bottom: 24px;
+        }
+        .stat-card {
+            border: 0;
+            border-radius: 16px;
+            background: #ffffff;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
+            padding: 20px;
+            transition: transform 0.2s;
+        }
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+        }
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+        .queue-card {
+            background: #ffffff;
+            border-radius: 18px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            border: 0;
+            overflow: hidden;
+        }
+        .token-pill {
+            font-family: monospace;
+            font-weight: 800;
+            font-size: 0.95rem;
+            padding: 5px 10px;
+            border-radius: 8px;
+            background: #0f172a;
+            color: #facc15;
+            letter-spacing: 1px;
+            display: inline-block;
+        }
+        .live-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: #22c55e;
+            display: inline-block;
+            box-shadow: 0 0 10px #22c55e;
+            animation: pulse-live 1.8s infinite;
+        }
+        @keyframes pulse-live {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
+            70% { transform: scale(1.1); box-shadow: 0 0 0 8px rgba(34, 197, 94, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+        }
+        .standee-poster-preview {
+            max-width: 580px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 3px solid #1b5e20;
+            border-radius: 20px;
+            padding: 30px 24px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+    </style>
+<link rel="stylesheet" href="https://cloudflare.com"/>
+<script src="https://cloudflare.com"></script>
+</head>
+<body>
+
+    <!-- Top Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark py-2 border-bottom border-secondary">
+        <div class="container-fluid px-4">
+            <a class="navbar-brand fw-bold d-flex align-items-center gap-2" href="#">
+                <span class="badge bg-success p-2 rounded-3"><i class="bi bi-qr-code-scan"></i></span>
+            </a>
+            <div class="d-flex align-items-center gap-2">
+                <span class="text-white-50 small d-none d-xl-inline me-1" id="liveClock">Wed, 11 Nov, 01:19:33 pm</span>
+
+                <div class="d-none d-md-flex align-items-center bg-dark bg-opacity-75 border border-success border-opacity-50 text-white px-3 py-1.5 rounded-pill small gap-2">
+                    <span class="text-success"><i class="bi bi-shield-fill-check fs-6"></i></span>
+                </div>
+
+                <a href="poster.php?shop=VLE-269513" target="_blank" class="btn btn-outline-warning btn-sm rounded-pill px-3 fw-bold shadow-sm d-none d-sm-inline-flex align-items-center gap-1">
+                    <i class="bi bi-file-earmark-image"></i> ಪೋಸ್ಟರ್ ಸ್ಟ್ಯಾಂಡಿ
+                </a>
+
+                <a href="logout.php" class="btn btn-danger btn-sm rounded-pill px-3 fw-bold shadow-sm d-flex align-items-center gap-1" onclick="return confirm('ಖಂಡಿತವಾಗಿ ಲಾಗ್ಔಟ್ ಮಾಡಲು ಬಯಸುತ್ತೀರಾ?');">
+                    <i class="bi bi-box-arrow-right"></i>
+                    <span>ಲಾಗ್‌ಔಟ್ (Logout)</span>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <div class="container-fluid px-3 px-md-4 py-4">
+
+        <!-- 1. Header Banner -->
+        <div class="vle-banner">
+            <div class="row align-items-center">
+                <div class="col-lg-7 mb-3 mb-lg-0">
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <span class="badge bg-warning text-dark px-3 py-1 rounded-pill fw-bold">
+                        </span>
+                        <span class="badge bg-light text-success fw-bold d-inline-flex align-items-center gap-1">
+                            <span class="live-dot"></span> ನೇರ ಸಾಲು (Live Queue)
+                        </span>
+                    </div>
+                    <h2 class="fw-black mb-1">NR COMPUTER CENTER</h2>
+                    <p class="text-white-50 mb-2 small">
+                        ಅಂಗಡಿಯ ಕೌಂಟರ್‌ನಲ್ಲಿ ಕ್ಯೂಆರ್ (QR) ಸ್ಟ್ಯಾಂಡಿ ಇರಿಸಿ. ಗ್ರಾಹಕರು ಮೊಬೈಲ್ ಮೂಲಕ ಸ್ಕ್ಯಾನ್ ಮಾಡಿ ಫೈಲ್ ಅಪ್‌ಲೋಡ್ ಮಾಡಿದರೆ ನೇರವಾಗಿ ನಿಮ್ಮ ಡ್ಯಾಶ್‌ಬೋರ್ಡ್‌ಗೆ ಬರುತ್ತದೆ.
+                    </p>
+                    <div class="d-flex flex-wrap align-items-center gap-2">
+                        <span class="badge bg-dark bg-opacity-40 text-white font-monospace px-3 py-2 border border-white border-opacity-25 rounded-pill shadow-sm">
+                           
+                        </span>
+                        <span class="badge bg-success bg-opacity-75 text-white px-3 py-2 rounded-pill shadow-sm">
+                            <i class="bi bi-shield-fill-check me-1"></i> ಸ್ಥಿತಿ: ಸಕ್ರಿಯವಾಗಿದೆ (Active)
+                        </span>
+                    </div>
+                </div>
+                <div class="col-lg-5 text-lg-end d-flex flex-wrap gap-2 justify-content-lg-end align-items-center">
+                    <button type="button" class="btn btn-warning text-dark fw-bold rounded-pill px-3 py-2 shadow-sm d-flex align-items-center gap-2" onclick="window.open('/poster.html', '_blank')">
+                        <i class="bi bi-printer-fill fs-5"></i>
+                        <span>QR ಪೋಸ್ಟರ್ / ಸ್ಟ್ಯಾಂಡಿ</span>
+                    </button>
+                    <button type="button" class="btn btn-light text-success fw-bold rounded-pill px-3 py-2 shadow-sm d-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#modalSettings">
+                        <i class="bi bi-sliders fs-5"></i>
+                        <span>ದರ ಪಟ್ಟಿ & ಸೆಟ್ಟಿಂಗ್ಸ್</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. Today's Statistics Cards (ಇಂದಿನ ವರದಿ) -->
+        <div class="row g-3 mb-4">
+            <div class="col-6 col-md-4 col-xl-2">
+                <div class="stat-card">
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <span class="text-muted extra-small fw-bold text-uppercase">ಇಂದಿನ ಪ್ರಿಂಟ್‌ಗಳು</span>
+                        <div class="stat-icon bg-primary bg-opacity-10 text-primary">
+                            <i class="bi bi-file-earmark-check"></i>
+                        </div>
+                    </div>
+                    <h3 class="fw-black mb-0 text-dark" id="statTotalJobs">0</h3>
+                    <small class="text-muted extra-small">ಸ್ವೀಕರಿಸಿದ ಒಟ್ಟು ಫೈಲ್‌ಗಳು</small>
+                </div>
+            </div>
+
+            <div class="col-6 col-md-4 col-xl-2">
+                <div class="stat-card border-start border-warning border-4">
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <span class="text-muted extra-small fw-bold text-uppercase">ಬಾಕಿ ಪ್ರಿಂಟ್ (Pending)</span>
+                        <div class="stat-icon bg-warning bg-opacity-10 text-warning">
+                            <i class="bi bi-hourglass-split"></i>
+                        </div>
+                    </div>
+                    <h3 class="fw-black mb-0 text-warning" id="statPendingJobs">0</h3>
+                    <small class="text-muted extra-small">ಕಾಯುತ್ತ ರುವ ಫೈಲ್‌ಗಳು</small>
+                </div>
+            </div>
+
+            <div class="col-6 col-md-4 col-xl-2">
+                <div class="stat-card">
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <span class="text-muted extra-small fw-bold text-uppercase">B/W ಕಪ್ಪು-ಬಿಳುಪು</span>
+                        <div class="stat-icon bg-dark bg-opacity-10 text-dark">
+                            <i class="bi bi-file-earmark-text"></i>
+                        </div>
+                    </div>
+                    <h3 class="fw-black mb-0 text-dark" id="statBwCopies">0</h3>
+                    <small class="text-muted extra-small">ಕಾಪಿಗಳು (₹5/ಪುಟ)</small>
+                </div>
+            </div>
+
+            <div class="col-6 col-md-4 col-xl-2">
+                <div class="stat-card">
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <span class="text-muted extra-small fw-bold text-uppercase">ಕಲರ್ (Color) ಪ್ರಿಂಟ್</span>
+                        <div class="stat-icon bg-danger bg-opacity-10 text-danger">
+                            <i class="bi bi-palette-fill"></i>
+                        </div>
+                    </div>
+                    <h3 class="fw-black mb-0 text-danger" id="statColorCopies">0</h3>
+                    <small class="text-muted extra-small">ಕಾಪಿಗಳು (₹10/ಪುಟ)</small>
+                </div>
+            </div>
+
+            <div class="col-6 col-md-4 col-xl-2">
+                <div class="stat-card border-start border-success border-4">
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <span class="text-muted extra-small fw-bold text-uppercase">ಇಂದಿನ ಆದಾಯ</span>
+                        <div class="stat-icon bg-success bg-opacity-10 text-success">
+                            <i class="bi bi-currency-rupee"></i>
+                        </div>
+                    </div>
+                    <h3 class="fw-black mb-0 text-success" id="statTotalRevenue">₹0</h3>
+                    <small class="text-muted extra-small">ಇಂದಿನ ಒಟ್ಟು ಮೊತ್ತ</small>
+                </div>
+            </div>
+
+            <div class="col-6 col-md-4 col-xl-2">
+                <div class="stat-card">
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <span class="text-muted extra-small fw-bold text-uppercase">ಮುಗಿದ ಪ್ರಿಂಟ್‌ಗಳು</span>
+                        <div class="stat-icon bg-info bg-opacity-10 text-info">
+                            <i class="bi bi-check2-all"></i>
+                        </div>
+                    </div>
+                    <h3 class="fw-black mb-0 text-info" id="statCompletedJobs">0</h3>
+                    <small class="text-muted extra-small">ಗ್ರಾಹಕರಿಗೆ ನೀಡಲಾಗಿದೆ</small>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<style>
+@keyframes spinBorder { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+@keyframes glowText { 0%,100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
+.nr-highlight-wrap {
+    position: relative; display: inline-block; padding: 4px; border-radius: 16px; overflow: hidden;
+    box-shadow: 0 0 22px rgba(255, 215, 0, 0.8), 0 0 35px rgba(0, 229, 255, 0.5); margin: 4px 0;
+}
+.nr-highlight-wrap::before {
+    content: ''; position: absolute; top: -150%; left: -50%; width: 200%; height: 400%;
+    background: conic-gradient(#ff0055, #ffdd00, #00ff88, #00ccff, #aa00ff, #ff0055);
+    animation: spinBorder 2.5s linear infinite;
+}
+.nr-highlight-inner {
+    position: relative; z-index: 1; background: #0f172a; padding: 6px 22px; border-radius: 13px;
+}
+.nr-highlight-inner h2 {
+    margin: 0 !important; font-weight: 900 !important;
+    background: linear-gradient(90deg, #ffeb3b, #00e676, #00e5ff, #ff4081, #ffeb3b);
+    background-size: 300%; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    animation: glowText 3.5s ease infinite;
+}
+</style>
+<script>
+window.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('button, a').forEach(el => {
+        const txt = el.textContent || '';
+        if (txt.includes('ಲಾಗ್') || txt.includes('Logout')) el.style.display = 'none';
+        if (el.getAttribute('href')?.includes('poster.php')) el.setAttribute('href', '/poster.html');
+    });
+    const h2 = document.querySelector('.vle-banner h2');
+    if (h2 && !h2.parentElement.classList.contains('nr-highlight-inner')) {
+        const wrap = document.createElement('div'); wrap.className = 'nr-highlight-wrap';
+        const inner = document.createElement('div'); inner.className = 'nr-highlight-inner';
+        h2.parentNode.insertBefore(wrap, h2); inner.appendChild(h2); wrap.appendChild(inner);
+    }
+    const navRight = document.querySelector('.navbar .d-flex.align-items-center.gap-2');
+    if (navRight && !document.getElementById('shopToggleBtn')) {
+        const btn = document.createElement('button');
+        btn.id = 'shopToggleBtn';
+        btn.className = 'btn btn-success btn-sm rounded-pill px-3 fw-bold shadow-sm';
+        btn.innerHTML = '🟢 SHOP OPEN (ಮುಚ್ಚಲು ಒತ್ತಿ)';
+        let isOpen = true;
+        const updateBtn = () => {
+            btn.className = isOpen ? 'btn btn-success btn-sm rounded-pill px-3 fw-bold shadow-sm' : 'btn btn-danger btn-sm rounded-pill px-3 fw-bold shadow-sm';
+            btn.innerHTML = isOpen ? '🟢 SHOP OPEN (ಮುಚ್ಚಲು ಒತ್ತಿ)' : '🔴 SHOP CLOSED (ತೆರೆಯಲು ಒತ್ತಿ)';
+        };
+        fetch('/api/shop-status').then(r=>r.json()).then(d=>{ isOpen=d.open; updateBtn(); }).catch(()=>{});
+        btn.onclick = () => {
+            fetch('/api/shop-status', {
+                method: 'POST', headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ open: !isOpen })
+            }).then(r=>r.json()).then(d=>{ isOpen=d.open; updateBtn(); });
+        };
+        navRight.prepend(btn);
+    }
+});
+</script>
+
+
+<div class="modal fade" id="nrSettingsModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content rounded-4 border-0 shadow-lg">
+      <div class="modal-header bg-success text-white">
+        <h5 class="modal-title fw-bold"><i class="bi bi-sliders me-2"></i>ದರ ಪಟ್ಟಿ & ಶಾಪ್ ಸೆಟ್ಟಿಂಗ್ಸ್</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body p-4">
+        <div class="mb-3">
+          <label class="form-label fw-bold">ಅಂಗಡಿಯ ಹೆಸರು (Shop Name)</label>
+          <input type="text" id="setShopName" class="form-control rounded-3" value="NR COMPUTER CENTER">
+        </div>
+        <div class="row g-3 mb-3">
+          <div class="col-6">
+            <label class="form-label fw-bold">B/W ಪ್ರಿಂಟ್ ದರ (₹/ಪುಟ)</label>
+            <input type="number" id="setBwRate" class="form-control rounded-3" value="5">
+          </div>
+          <div class="col-6">
+            <label class="form-label fw-bold">Color ಪ್ರಿಂಟ್ ದರ (₹/ಪುಟ)</label>
+            <input type="number" id="setColorRate" class="form-control rounded-3" value="10">
+          </div>
+        </div>
+        <button type="button" onclick="saveNrSettings()" class="btn btn-success w-100 rounded-pill fw-bold py-2">
+          <i class="bi bi-check-circle me-1"></i> ಸೆಟ್ಟಿಂಗ್ಸ್ ಉಳಿಸಿ (Save)
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+window.addEventListener('DOMContentLoaded', () => {
+    // 1. ದರ ಪಟ್ಟಿ & ಸೆಟ್ಟಿಂಗ್ಸ್ ಬಟನ್ ಹುಡುಕುವುದು ಅಥವಾ ಹೊಸದಾಗಿ ಸೇರಿಸುವುದು
+    let setBtn = Array.from(document.querySelectorAll('button, a')).find(el => (el.textContent || '').includes('ದರ ಪಟ್ಟಿ') || el.querySelector('.bi-sliders'));
+    
+    if (!setBtn) {
+        const posterBtn = Array.from(document.querySelectorAll('button, a')).find(el => (el.textContent || '').includes('ಪೋಸ್ಟರ್'));
+        if (posterBtn && posterBtn.parentElement) {
+            setBtn = document.createElement('button');
+            setBtn.type = 'button';
+            setBtn.className = 'btn btn-light text-success fw-bold rounded-pill px-3 py-2 shadow-sm d-flex align-items-center gap-2';
+            setBtn.innerHTML = '<i class="bi bi-sliders fs-5"></i><span>ದರ ಪಟ್ಟಿ & ಸೆಟ್ಟಿಂಗ್ಸ್</span>';
+            posterBtn.parentElement.appendChild(setBtn);
+        }
+    }
+
+    if (setBtn) {
+        setBtn.style.display = 'inline-flex';
+        setBtn.removeAttribute('data-bs-toggle');
+        setBtn.removeAttribute('data-bs-target');
+        setBtn.onclick = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            document.getElementById('setShopName').value = localStorage.getItem('nr_shop_name') || 'NR COMPUTER CENTER';
+            document.getElementById('setBwRate').value = localStorage.getItem('nr_bw_rate') || '5';
+            document.getElementById('setColorRate').value = localStorage.getItem('nr_color_rate') || '10';
+            if (window.bootstrap) {
+                new bootstrap.Modal(document.getElementById('nrSettingsModal')).show();
+            } else {
+                const m = document.getElementById('nrSettingsModal');
+                m.style.display = 'block';
+                m.classList.add('show');
+                m.style.background = 'rgba(0,0,0,0.5)';
+            }
+        };
+    }
+
+    // ಉಳಿಸಿದ ಹೆಸರನ್ನು ಅನ್ವಯಿಸುವುದು
+    const savedName = localStorage.getItem('nr_shop_name');
+    const h2 = document.querySelector('.vle-banner h2');
+    if (savedName && h2) h2.textContent = savedName;
+});
+
+function saveNrSettings() {
+    const name = document.getElementById('setShopName').value.trim();
+    const bw = document.getElementById('setBwRate').value.trim();
+    const color = document.getElementById('setColorRate').value.trim();
+    if (name) {
+        localStorage.setItem('nr_shop_name', name);
+        const h2 = document.querySelector('.vle-banner h2');
+        if (h2) h2.textContent = name;
+    }
+    localStorage.setItem('nr_bw_rate', bw);
+    localStorage.setItem('nr_color_rate', color);
+    alert('ಸೆಟ್ಟಿಂಗ್ಸ್ ಯಶಸ್ವಿಯಾಗಿ ಉಳಿಸಲಾಗಿದೆ!');
+    location.reload();
+}
+</script>
+
+<script>
+function openBrowserPrint(url) {
+    const w = window.open(url, '_blank');
+    if (w) {
+        w.onload = () => { w.focus(); w.print(); };
+    }
+}
+
+function loadCustomerFiles() {
+    fetch('/api/jobs')
+        .then(res => res.json())
+        .then(data => {
+            const jobs = Array.isArray(data) ? data : (data.jobs || []);
+            let tbody = document.querySelector('table tbody');
+            if (!tbody) {
+                const allContainers = document.querySelectorAll('.container-fluid');
+                const container = allContainers.length > 1 ? allContainers[allContainers.length - 1] : document.body;
+                const qDiv = document.createElement('div');
+                qDiv.className = 'card border-0 shadow-sm rounded-4 overflow-hidden mt-4';
+                qDiv.innerHTML = `
+                    <div class="card-header bg-white py-3 px-4 d-flex justify-content-between align-items-center border-bottom">
+                        <h5 class="mb-0 fw-bold text-success"><i class="bi bi-printer-fill me-2"></i>ನೇರ ಪ್ರಿಂಟ್ ಕ್ಯೂ (Live Incoming Queue)</h5>
+                        <button onclick="loadCustomerFiles()" class="btn btn-outline-success btn-sm rounded-pill px-3 fw-bold"><i class="bi bi-arrow-clockwise"></i> ರಿಫ್ರೆಶ್</button>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="ps-4">ಟೋಕನ್ (Token)</th>
+                                    <th>ಫೈಲ್ ಹೆಸರು (Document)</th>
+                                    <th>ಪ್ರಿಂಟ್ ವಿವರ</th>
+                                    <th>ಸ್ಥಿತಿ (Status)</th>
+                                    <th class="text-end pe-4">ಪ್ರಿಂಟ್ & ಕ್ರಮ</th>
+                                </tr>
+                            </thead>
+                            <tbody id="nrLiveJobsBody"></tbody>
+                        </table>
+                    </div>`;
+                container.appendChild(qDiv);
+                tbody = document.getElementById('nrLiveJobsBody');
+            }
+
+            const statNums = document.querySelectorAll('.stat-card .fs-3, .stat-card h2, .stat-card h3');
+            if (statNums.length >= 6) {
+                const waiting = jobs.filter(j => j.status !== 'printed').length;
+                const printed = jobs.filter(j => j.status === 'printed').length;
+                const bwCount = jobs.filter(j => (j.print_type || '').toLowerCase().includes('b')).reduce((s, j) => s + (Number(j.copies) || 1), 0);
+                const colorCount = jobs.filter(j => (j.print_type || '').toLowerCase().includes('c')).reduce((s, j) => s + (Number(j.copies) || 1), 0);
+                statNums[0].textContent = jobs.length;
+                statNums[1].textContent = waiting;
+                statNums[2].textContent = bwCount;
+                statNums[3].textContent = colorCount;
+                statNums[5].textContent = printed;
+            }
+
+            if (jobs.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="text-center py-5 text-muted fw-bold">ಯಾವುದೇ ಪ್ರಿಂಟ್ ಫೈಲ್‌ಗಳು ಬಂದಿಲ್ಲ.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = jobs.map(j => {
+                const rawFile = j.file_path || j.path || j.filename || j.file_name || j.stored_name || ''; const fileUrl = rawFile.includes('uploads') ? ('/' + rawFile.replace(/^.*[\\\/]uploads[\\\/]/, 'uploads/')) : ('/uploads/' + rawFile);
+                const isPrinted = j.status === 'printed';
+                const statusBadge = isPrinted
+                    ? '<span class="badge bg-success px-3 py-2 rounded-3"><i class="bi bi-check-circle-fill me-1"></i> Printed</span>'
+                    : '<span class="badge bg-warning text-dark px-3 py-2 rounded-3 fw-bold"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#16a34a;margin-right:5px;"></span>Waiting</span>';
+
+                return `<tr>
+                    <td class="ps-4"><span class="token-pill">#${j.id}</span><div class="small text-muted mt-1">${j.created_at || ''}</div></td>
+                    <td><div class="fw-bold text-dark">${j.original_name || 'Document'}</div><div class="small text-muted">Pages: ${j.pages || 1}</div></td>
+                    <td><span class="badge bg-dark">${j.print_type || 'B/W'}</span> <span class="badge bg-secondary">${j.copies || 1} Copy</span></td>
+                    <td>${statusBadge}</td>
+                    <td class="text-end pe-4">
+                        <div class="btn-group shadow-sm" role="group">
+                            <button onclick="openBrowserPrint('${fileUrl}')" class="btn btn-primary btn-sm fw-bold px-3" title="Print">
+                                <i class="bi bi-printer-fill me-1"></i> Print
+                            </button>
+                            <button onclick="openAdminCrop('${fileUrl}', '${j.original_name || "cropped.jpg"}')" class="btn btn-warning btn-sm px-2 fw-bold" title="Crop Image"><i class="bi bi-crop"></i></button><a href="${fileUrl}" target="_blank" class="btn btn-outline-primary btn-sm px-2" title="View">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                            <a href="${fileUrl}" download="${j.original_name || 'file'}" class="btn btn-light border btn-sm px-2" title="Download">
+                                <i class="bi bi-download"></i>
+                            </a>
+                            <button onclick="nrDoneFile('${j.id}')" class="btn btn-success btn-sm px-2" title="Done">
+                                <i class="bi bi-check-lg"></i>
+                            </button>
+                            <button onclick="nrDeleteFile('${j.id}')" class="btn btn-light border text-danger btn-sm px-2" title="Delete">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>`;
+            }).join('');
+        })
+        .catch(err => console.error(err));
+}
+
+function nrDoneFile(id) {
+    fetch('/api/jobs/status', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: id, jobId: id, status: 'printed' })
+    }).then(() => loadCustomerFiles());
+}
+function nrDeleteFile(id) {
+    if (!confirm('ಈ ಫೈಲ್ ಅಳಿಸಲು ಖಚಿತವೇ?')) return;
+    fetch('/api/jobs/' + id, { method: 'DELETE' }).then(() => loadCustomerFiles());
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+    loadCustomerFiles();
+    setInterval(loadCustomerFiles, 3000);
+});
+</script>
+<!-- Admin Image Crop Modal -->
+<div class="modal fade" id="adminCropModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content rounded-4 border-0 shadow-lg">
+      <div class="modal-header bg-dark text-white">
+        <h5 class="modal-title fw-bold"><i class="bi bi-crop text-warning me-2"></i>ಫೋಟೋ ಕ್ರಾಪ್ & ಪ್ರಿಂಟ್ (Crop Tool)</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body bg-light text-center p-3">
+        <div style="height: 55vh; width: 100%; overflow: hidden; background: #0f172a; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+          <img id="adminCropImage" style="max-width: 100%; display: block;" alt="Crop Image">
+        </div>
+        <div class="d-flex justify-content-center gap-2 mt-3 flex-wrap">
+          <button type="button" onclick="adminCropper && adminCropper.rotate(-90)" class="btn btn-outline-secondary btn-sm rounded-pill px-3"><i class="bi bi-arrow-counterclockwise"></i> ಎಡಕ್ಕೆ ತಿರುಗಿಸಿ</button>
+          <button type="button" onclick="adminCropper && adminCropper.rotate(90)" class="btn btn-outline-secondary btn-sm rounded-pill px-3"><i class="bi bi-arrow-clockwise"></i> ಬಲಕ್ಕೆ ತಿರುಗಿಸಿ</button>
+          <button type="button" onclick="adminCropper && adminCropper.reset()" class="btn btn-outline-secondary btn-sm rounded-pill px-3">ರಿಸೆಟ್ (Reset)</button>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary rounded-pill" data-bs-dismiss="modal">ಮುಚ್ಚಿ (Close)</button>
+        <button type="button" onclick="downloadCroppedAdmin()" class="btn btn-outline-success rounded-pill fw-bold px-3"><i class="bi bi-download me-1"></i> ಡೌನ್‌ಲೋಡ್</button>
+        <button type="button" onclick="printCroppedAdmin()" class="btn btn-primary rounded-pill fw-bold px-4"><i class="bi bi-printer-fill me-1"></i> ಕ್ರಾಪ್ ಪ್ರಿಂಟ್ (Print)</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+let adminCropper = null;
+let currentCropFilename = 'cropped.jpg';
+
+function openAdminCrop(url, filename) {
+    if (url.toLowerCase().endsWith('.pdf')) {
+        alert('PDF ಫೈಲ್‌ಗಳನ್ನು ಕ್ರಾಪ್ ಮಾಡಲು ಸಾಧ್ಯವಿಲ್ಲ. ಕೇವಲ ಫೋಟೋ/ಇಮೇಜ್ (JPG, PNG) ಮಾತ್ರ ಕ್ರಾಪ್ ಮಾಡಬಹುದು.');
+        return;
+    }
+    currentCropFilename = filename;
+    const img = document.getElementById('adminCropImage');
+    img.src = url;
+    const modalEl = document.getElementById('adminCropModal');
+    const modal = new bootstrap.Modal(modalEl);
+    modal.show();
+
+    modalEl.addEventListener('shown.bs.modal', function onShown() {
+        if (adminCropper) adminCropper.destroy();
+        adminCropper = new Cropper(img, {
+            viewMode: 1,
+            autoCropArea: 1,
+            responsive: true
+        });
+        modalEl.removeEventListener('shown.bs.modal', onShown);
+    });
+}
+
+function downloadCroppedAdmin() {
+    if (!adminCropper) return;
+    const canvas = adminCropper.getCroppedCanvas({ fillColor: '#ffffff' });
+    const link = document.createElement('a');
+    link.download = 'cropped_' + currentCropFilename;
+    link.href = canvas.toDataURL('image/jpeg', 0.95);
+    link.click();
+}
+
+function printCroppedAdmin() {
+    if (!adminCropper) return;
+    const canvas = adminCropper.getCroppedCanvas({ fillColor: '#ffffff' });
+    const dataUrl = canvas.toDataURL('image/jpeg', 0.95);
+    const w = window.open('', '_blank');
+    if (w) {
+        w.document.write('<html><body style="margin:0;text-align:center;"><img src="' + dataUrl + '" style="max-width:100%;height:auto;" onload="window.print();window.close();"/></body></html>');
+        w.document.close();
+    }
+}
+</script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+

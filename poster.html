@@ -1,0 +1,276 @@
+﻿<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ಅಂಗಡಿಯ QR ಸ್ಟ್ಯಾಂಡಿ ಪೋಸ್ಟರ್ - NR QR PRINT SHOP</title>
+    
+    <!-- Bootstrap 5, Icons, Fonts -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- QRCode.js Library CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/davidshimjs-qrcodejs@0.0.2/qrcode.min.js"></script>
+
+    <style>
+        :root {
+            --primary-green: #1b5e20;
+            --primary-gradient: linear-gradient(135deg, #1b5e20 0%, #2e7d32 100%);
+            --accent-yellow: #fbc02d;
+        }
+        body {
+            font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+            background-color: #f1f8e9;
+            color: #1e293b;
+            padding: 20px 0;
+        }
+        .standee-poster {
+            max-width: 600px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 4px solid var(--primary-green);
+            border-radius: 24px;
+            padding: 35px 30px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+            text-align: center;
+            position: relative;
+        }
+        .qr-box {
+            background: #f8fafc;
+            border: 3px solid #81c784;
+            border-radius: 20px;
+            padding: 20px;
+            display: inline-block;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+            margin: 20px 0;
+        }
+        .rate-box {
+            border: 2px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 12px;
+            background: #fff;
+            transition: all 0.2s;
+        }
+        @media print {
+            body {
+                background: #ffffff !important;
+                padding: 0 !important;
+            }
+            .no-print {
+                display: none !important;
+            }
+            .standee-poster {
+                max-width: 100% !important;
+                border: 4px solid #1b5e20 !important;
+                box-shadow: none !important;
+                margin: 0 !important;
+                padding: 25px !important;
+            }
+        }
+    </style>
+<style>
+@keyframes spinLight {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+@keyframes rainbowText {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+.office-glow-box {
+    position: relative;
+    display: inline-block;
+    padding: 4px;
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 0 25px rgba(255, 215, 0, 0.5), 0 0 40px rgba(0, 255, 136, 0.3);
+    margin: 8px auto;
+}
+.office-glow-box::before {
+    content: '';
+    position: absolute;
+    top: -50%; left: -50%;
+    width: 200%; height: 200%;
+    background: conic-gradient(#ff0055, #ffcc00, #00ff88, #00ccff, #aa00ff, #ff0055);
+    animation: spinLight 3s linear infinite;
+    z-index: 0;
+}
+.office-glow-inner {
+    position: relative;
+    z-index: 1;
+    background: #0f172a;
+    padding: 10px 26px;
+    border-radius: 14px;
+}
+.office-rainbow-title {
+    font-weight: 900;
+    letter-spacing: 1.5px;
+    background: linear-gradient(90deg, #ffeb3b, #00e676, #00e5ff, #ff4081, #ffeb3b);
+    background-size: 300% 300%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: rainbowText 4s ease infinite;
+    margin: 0;
+    text-transform: uppercase;
+}
+</style>
+<style>
+@keyframes spinBorderLight {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+@keyframes multiColorText {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+.nr-rotating-pill {
+    position: relative !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 4px !important;
+    border-radius: 50px !important;
+    overflow: hidden !important;
+    background: transparent !important;
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.7), 0 0 35px rgba(0, 229, 255, 0.5) !important;
+    margin: 6px auto !important;
+}
+.nr-rotating-pill::before {
+    content: '' !important;
+    position: absolute !important;
+    top: -150% !important; left: -50% !important;
+    width: 200% !important; height: 400% !important;
+    background: conic-gradient(#ff0055, #ffdd00, #00ff88, #00ccff, #aa00ff, #ff0055) !important;
+    animation: spinBorderLight 2.5s linear infinite !important;
+    z-index: 0 !important;
+}
+.nr-rotating-inner {
+    position: relative !important;
+    z-index: 1 !important;
+    background: #0f172a !important;
+    padding: 8px 22px !important;
+    border-radius: 50px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+}
+.nr-glow-name {
+    font-weight: 900 !important;
+    font-size: 1.15rem !important;
+    letter-spacing: 0.8px !important;
+    background: linear-gradient(90deg, #ffeb3b, #00e676, #00e5ff, #ff4081, #ffeb3b) !important;
+    background-size: 300% 300% !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    animation: multiColorText 3.5s ease infinite !important;
+}
+</style>
+</head>
+<body>
+
+    <!-- Top Action Bar (Hidden when printing) -->
+    <div class="container text-center mb-4 no-print">
+        <button class="btn btn-success fw-bold rounded-pill px-4 py-2 shadow-sm me-2" onclick="window.print()">
+            <i class="bi bi-printer-fill me-1"></i> ಪೋಸ್ಟರ್ ಪ್ರಿಂಟ್ ಮಾಡಿ (Print Poster)
+        </button>
+        <a href="/" class="btn btn-outline-dark fw-bold rounded-pill px-4 py-2 shadow-sm">
+            <i class="bi bi-arrow-left me-1"></i> ಡ್ಯಾಶ್‌ಬೋರ್ಡ್‌ಗೆ ಹಿಂತಿರುಗಿ
+        </a>
+    </div>
+
+    <!-- Standee Poster Container -->
+    <div class="container">
+        <div class="standee-poster">
+            
+            <!-- Header Badge & Title -->
+            <div class="border-bottom pb-3 mb-3">
+                <span class="badge bg-success px-3 py-1.5 rounded-pill fw-bold mb-2 fs-6">
+                    <i class="bi bi-shield-check-fill me-1"></i> CSC VERIFIED DIGITAL PRINT HUB
+                </span>
+                <div class="office-glow-box"><div class="office-glow-inner"><h1 class="fw-black text-dark mb-1 display-6"><span class="office-rainbow-title">NR COMPUTERS</span></h1></div></div>
+                <p class="text-muted small mb-0 fw-semibold">
+                    <i class="bi bi-person-fill"></i> ನಿರ್ವಾಹಕರು: NAGESH M R &nbsp;&bull;&nbsp; <i class="bi bi-telephone-fill"></i> ಮೊ.: 9880098359
+                </p>
+            </div>
+
+            <!-- Main Call to Action -->
+            <div class="bg-light p-3 rounded-4 border border-success border-opacity-25 mb-2">
+                <h3 class="fw-black text-success mb-1">
+                    <i class="bi bi-phone-fill"></i> ನಿಮ್ಮ ಮೊಬೈಲ್‌ನಿಂದಲೇ ಪ್ರಿಂಟ್ ಕಳುಹಿಸಿ!
+                </h3>
+                <p class="text-muted small mb-0">ಲೈನ್‌ನಲ್ಲಿ ನಿಲ್ಲುವ ಅವಶ್ಯಕತೆಯಿಲ್ಲ. ತಕ್ಷಣ ನಿಮ್ಮ ಡಾಕ್ಯುಮೆಂಟ್ ಕಳುಹಿಸಿ ಟೋಕನ್ ಪಡೆಯಿರಿ.</p>
+            </div>
+
+            <!-- Dynamic QR Code Container -->
+            <div class="qr-box">
+                <div id="posterQrCode" class="d-flex justify-content-center"></div>
+                <div class="fw-black text-dark mt-3 fs-5">
+                    <i class="bi bi-camera-fill text-success me-1"></i> ಪ್ರಿಂಟ್‌ಗಾಗಿ ಇಲ್ಲಿ ಸ್ಕ್ಯಾನ್ ಮಾಡಿ
+                </div>
+            </div>
+
+            <!-- Rate Cards -->
+            <div class="row g-2 mb-4 justify-content-center">
+                <div class="col-6">
+                    <div class="rate-box">
+                        <div class="extra-small text-muted fw-bold">⚫ ಕಪ್ಪು ಮತ್ತು ಬಿಳಿ (B/W)</div>
+                        <h3 class="fw-black text-dark mb-0">₹5 <small class="fs-6 text-muted">/ಪುಟ</small></h3>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="rate-box border-danger">
+                        <div class="extra-small text-danger fw-bold">🎨 ಬಣ್ಣದ ಪ್ರಿಂಟ್ (Color)</div>
+                        <h3 class="fw-black text-danger mb-0">₹10 <small class="fs-6 text-muted">/ಪುಟ</small></h3>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Instructions Box -->
+            <div class="p-3 bg-light rounded-4 border text-start mb-3 shadow-sm">
+                <h6 class="fw-bold text-dark mb-2 d-flex align-items-center gap-1">
+                    <i class="bi bi-info-circle-fill text-success"></i> ಬಳಸುವುದು ಹೇಗೆ (How to Use):
+                </h6>
+                <ol class="small text-muted mb-0 ps-3 lh-base fw-medium">
+                    <li class="mb-1">ನಿಮ್ಮ ಮೊಬೈಲ್ ಕ್ಯಾಮೆರಾ ಅಥವಾ QR ಸ್ಕ್ಯಾನರ್ ಬಳಸಿ ಮೇಲಿನ <b>QR ಕೋಡ್ ಸ್ಕ್ಯಾನ್ ಮಾಡಿ</b>.</li>
+                    <li class="mb-1">ತೆರೆದ ಪುಟದಲ್ಲಿ ನಿಮ್ಮ ಫೈಲ್ <b>(PDF, ಡಾಕ್ಯುಮೆಂಟ್ ಅಥವಾ ಫೋಟೋ)</b> ಆಯ್ಕೆಮಾಡಿ.</li>
+                    <li class="mb-1">ಪ್ರಿಂಟ್ ಪ್ರಕಾರ (Color/BW) ಹಾಗೂ ಕಾಪಿಗಳ ಸಂಖ್ಯೆಯನ್ನು ಆರಿಸಿ.</li>
+                    <li><b>'ಪ್ರಿಂಟ್ ಮಾಡಲು ಫೈಲ್ ಕಳುಹಿಸಿ'</b> ಒತ್ತಿ — ಟೋಕನ್ ನಂಬರ್ ಬರುತ್ತದೆ, ಕೌಂಟರ್‌ನಲ್ಲಿ ತೋರಿಸಿ ಪ್ರಿಂಟ್ ಪಡೆಯಿರಿ!</li>
+                </ol>
+            </div>
+
+            <!-- UPI Payment Footer Note -->
+            <div class="p-2.5 bg-warning bg-opacity-10 rounded-3 border border-warning text-center small fw-bold text-dark">
+                <i class="bi bi-wallet2 text-success me-1"></i> UPI ಪಾವತಿ ಲಭ್ಯವಿದೆ &bull; UPI ID: <span class="font-monospace text-primary">nageshmr@ybl</span>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- QR Generation Script -->
+    <script>
+        // ಗ್ರಾಹಕರು ಸ್ಕ್ಯಾನ್ ಮಾಡಿದರೆ ನೇರವಾಗಿ ಅಪ್‌ಲೋಡ್ ಪೇಜ್ ತೆರೆಯುವ ಲಿಂಕ್
+        const customerUploadUrl = window.location.origin + '/customer';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const container = document.getElementById('posterQrCode');
+            if (container) {
+                container.innerHTML = '';
+                new QRCode(container, {
+                    text: customerUploadUrl,
+                    width: 200,
+                    height: 200,
+                    colorDark: "#0f172a",
+                    colorLight: "#ffffff",
+                    correctLevel: QRCode.CorrectLevel.H
+                });
+            }
+        });
+    </script>
+</body>
+</html>
+
+
+

@@ -1,0 +1,4 @@
+[2026-11-04T15:51:55.257Z] [ERROR] Failed to print document on physical hardware: Command failed: C:\Users\user\Desktop\rama\node_modules\pdf-to-printer\dist\SumatraPDF-3.4.6-32.exe -print-to EPSON L3210 Series -silent -print-settings fit,simplex C:\Users\user\Desktop\rama\uploads\1793807324883-384201287.pdf
+
+[2026-11-04T16:10:14.408Z] [ERROR] Failed to print document on physical hardware: Command failed: C:\Users\user\Desktop\rama\node_modules\pdf-to-printer\dist\SumatraPDF-3.4.6-32.exe -print-to EPSON L3210 Series -silent -print-settings fit,simplex C:\Users\user\Desktop\rama\uploads\1793807324883-384201287.pdf
+
